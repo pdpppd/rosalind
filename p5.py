@@ -1,4 +1,4 @@
-data = open('test.txt')
+data = open('texzt.txt')
 data = data.read()
 data = data.replace('\n', '')
 data = data.split('>')

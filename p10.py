@@ -1,16 +1,39 @@
 
 import numpy as np 
 
+# def process_fasta(path):
+#     raw = open(path)
+#     raw = raw.read()
+#     rawsplit = raw.split('\n')
+#     fasta = list(map(lambda x: x[1:] if x[0] == '>' else x, rawsplit))
+#     final = {}
+#     for i in range(0, len(fasta), 2):
+#         x = fasta[i+1]
+#         x = list(x)
+#         final[fasta[i]] = x
+
+#     print('final = ',final)
+#     return final
+
 def process_fasta(path):
     raw = open(path)
     raw = raw.read()
-    rawsplit = raw.split('\n')
-    fasta = list(map(lambda x: x[1:] if x[0] == '>' else x, rawsplit))
+    new = raw.split('\n')
+    indices = []
     final = {}
-    for i in range(0, len(fasta), 2):
-        x = fasta[i+1]
-        x = list(x)
-        final[fasta[i]] = x
+    for index, item in enumerate(new): 
+        if item[0] == '>':
+            indices.append(index)
+    for i, index in enumerate(indices): 
+        if index == indices[-1]:
+            a = ''.join(new[index + 1:])
+        else:   
+            a = ''.join(new[index + 1: indices[i + 1]])
+        name = new[index]
+        name = name[1:]
+        final[name] = list(a)
+        print(a)
+    print('final ', final)
     return final
 
 def creatematrix(data_dict):
@@ -32,7 +55,8 @@ def createprofile(dnamatrix):
         profile.append([A, C, G, T])
     profile = np.array(profile)
     profile_transposed = profile.transpose()
-    return profile_transposed, profile 
+    listverson = profile_transposed.tolist()
+    return profile_transposed, profile, listverson
 
 def createconsensus(profile):
     consensus = ''
@@ -45,20 +69,31 @@ def createconsensus(profile):
     return consensus
 
 data = process_fasta('sample.txt')
-print(data)
-print('------')
+# print(data)
+# print('------')
 
 matrix = creatematrix(data)
-print(matrix)
-print('------')
+# print(matrix)
+# print('------')
 
-profile_t, profile = createprofile(matrix)
-print(profile)
-print('------')
+profile_t, profile, listversion = createprofile(matrix)
+# print(profile)
+# print('------')
 
 consensus = createconsensus(profile)
 print(consensus)
-print('A:', profile_t[0])
-print('C:', profile_t[1])
-print('G:', profile_t[2])
-print('T:', profile_t[3])
+print('A:', end = ' ')
+for i in listversion[0]:
+    print(i, end=' ')
+print('')
+print('C:', end = ' ')
+for i in listversion[1]:
+    print(i, end=' ')
+print('')
+print('G:', end = ' ')
+for i in listversion[2]:
+    print(i, end=' ')
+print('')
+print('T:', end = ' ')
+for i in listversion[3]:
+    print(i, end=' ')
