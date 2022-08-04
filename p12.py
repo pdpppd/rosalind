@@ -1,4 +1,22 @@
-from difflib import SequenceMatcher
+import itertools
+import networkx as nx
+import matplotlib.pyplot as plt
+   
+class GraphVisualization:
+   
+    def __init__(self):
+        self.visual = []
+          
+    def addEdge(self, a, b):
+        temp = [a, b]
+        self.visual.append(temp)
+          
+
+    def visualize(self):
+        G = nx.Graph()
+        G.add_edges_from(self.visual)
+        nx.draw_networkx(G)
+        plt.show()
 
 def process_fasta(path):
     raw = open(path)
@@ -17,44 +35,38 @@ def process_fasta(path):
         name = new[index]
         name = name[1:]
         final[name] = a
-        # print(a)
-    # print('final ', final)
     return final
 
-# test AAATAAA
-#      AAATCCC
 def matchie(a, b):
     cnt = 0
-    bruh = True
-    match = False
-    while True: 
-        if a[:cnt] == b[-cnt:]:
-            print('yay')
-            print(a[:cnt])
-            print(b[-cnt:])
-            match = True
-        elif a[-cnt:] == b[:cnt]:
-            print('yay')
-            print(a[-cnt:])
-            print(b[:cnt])
-            match = True
-        else:
+    match = (False, cnt) 
+    ind = 0
+    while cnt <= 3: 
+        if a[-cnt:] == b[:cnt]:
+            match = (True, cnt)
+        if cnt == len(a):
             break
         cnt += 1
-
-    if match == True: 
-        return True
+    ind = match[1]
+    if ind == 3: 
+        match = True
     else: 
-        return False
-        # if cnt == len(a):
-        #     return False
-        #     break
-        
+        match = False
+    return match, ind
 
-def main(): 
-    bro = process_fasta('data/p12test.txt')
-    print(matchie(bro['Rosalind_0498'], bro['Rosalind_2391']))
-
+def main():
+    G = GraphVisualization()
+    genomes = process_fasta('data/p12test.txt')
+    for genome1, genome2 in itertools.permutations(genomes, 2):
+        result, ind = matchie(genomes[genome1], genomes[genome2])
+        if genomes[genome1] == genomes[genome2]:
+            result = False
+        if result == True: 
+            print("{} {}".format(genome1, genome2))
+            G.addEdge(genome1, genome2)
+            # print("{} {}".format(genomes[genome1], genomes[genome2]))
+            # print(ind)
+    G.visualize()
 
 if __name__ == '__main__':
     main()
